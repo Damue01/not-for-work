@@ -81,7 +81,7 @@ h2 {margin:0 0 20px;font-size:16px;line-height:1.5;font-weight:500}h2:focus {out
 /* Portals own their stacking context; nested calendar selects are above the date popup. */
 [data-slot="popover-positioner"] {z-index:50}[data-slot="select-positioner"] {z-index:60}
 .date-popup {max-width:calc(100vw - 24px)}.calendar-select-popup {max-height:min(300px,var(--available-height))}
-main>section,.tarot-answer {animation:arrive 220ms ease-out both}
+.methods,.stage-body>section {animation:stage-fade 180ms ease-out both}
 .choices.tarot {gap:clamp(12px,3vw,28px);padding:24px 4px 20px;perspective:1000px}
 .choices.tarot .tarot-card {position:relative;display:block;padding:0;width:100%;height:auto;min-height:0;aspect-ratio:3/5;border:0;border-radius:10px;background:transparent;box-shadow:none;perspective:1000px;transition:transform 240ms ease,opacity 240ms ease;overflow:visible}
 .tarot-card img {display:block;width:100%;height:100%;border-radius:10px}.choices.tarot .tarot-card:nth-child(1){transform:translateY(8px) rotate(-5deg)}.choices.tarot .tarot-card:nth-child(3){transform:translateY(8px) rotate(5deg)}
@@ -113,24 +113,52 @@ main>section,.tarot-answer {animation:arrive 220ms ease-out both}
 .ritual-target:disabled {opacity:1}
 .ritual-target .ritual-svg {width:160px;height:180px;opacity:1}
 .pendulum-arm {transform-origin:80px 20px}
-.is-moving .pendulum-arm {animation:pendulum-swing 550ms ease-in-out 2}
+.is-moving .pendulum-arm {animation:pendulum-swing 1200ms ease-in-out both}
 .crystal-halo {opacity:0}
-.is-moving .crystal-halo {animation:crystal-glow 1s ease-in-out}
-.is-moving .crystal-mist {animation:crystal-drift 1s ease-in-out}
+.is-moving .crystal-halo {transform-origin:90px 77px;animation:crystal-glow 960ms ease-in-out both}
+.is-moving .crystal-mist {animation:crystal-drift 960ms ease-in-out both}
 .ritual-answer {text-align:center;animation:arrive 220ms ease-out both}
 .ritual-answer h2 {font-size:clamp(28px,6vw,36px);font-weight:600;margin:20px 0 24px}
 .six-yao-ritual {display:flex;flex-direction:column;align-items:center;gap:16px}
 .coins {display:flex;gap:12px;height:36px}
 .coin {display:flex;width:36px;height:36px;align-items:center;justify-content:center;border:1px solid #c5b58d;border-radius:50%;background:#f5f0e4;color:#887650;font-size:13px}
-.coins.is-moving .coin {animation:coin-toss 420ms ease-in-out}
+.coins.is-moving .coin {animation:coin-toss 440ms cubic-bezier(.25,.5,.4,1) both}
+.coins.is-moving .coin:nth-child(2){animation-delay:40ms}.coins.is-moving .coin:nth-child(3){animation-delay:80ms}
 .yao-lines {display:flex;flex-direction:column-reverse;gap:10px;width:112px;height:86px}
 .yao-line {display:flex;gap:14px;height:6px}
 .yao-line span {height:6px;flex:1;background:#77716a;border-radius:1px}
 .yao-line.yang {gap:0}.yao-line.yang span {border-radius:0}
 .yao-line.empty span {background:#efeeec}
 .cast-count {font-size:13px;line-height:20px;color:var(--muted-foreground)}
-@keyframes pendulum-swing {0%,100%{transform:rotate(0)}25%{transform:rotate(15deg)}75%{transform:rotate(-15deg)}}
-@keyframes crystal-glow {0%,100%{opacity:0}50%{opacity:.65}}
-@keyframes crystal-drift {0%,100%{transform:translateX(0)}50%{transform:translateX(10px)}}
-@keyframes coin-toss {50%{transform:translateY(-8px) rotateY(180deg)}}
+@keyframes pendulum-swing {0%,100%{transform:rotate(0)}18%{transform:rotate(17deg)}40%{transform:rotate(-13deg)}60%{transform:rotate(8deg)}77%{transform:rotate(-4deg)}90%{transform:rotate(1.5deg)}}
+@keyframes crystal-glow {0%,100%{opacity:0;transform:scale(.94)}48%{opacity:.7;transform:scale(1.05)}78%{opacity:.24;transform:scale(1)}}
+@keyframes crystal-drift {0%,100%{transform:translate(0,0);opacity:.24}50%{transform:translate(8px,-4px);opacity:.44}}
+@keyframes coin-toss {0%{transform:translateY(0) rotateY(0);opacity:.6}42%{transform:translateY(-19px) rotateY(180deg);opacity:1}78%{transform:translateY(0) rotateY(360deg)}90%{transform:translateY(-3px) rotateY(360deg)}100%{transform:translateY(0) rotateY(360deg);opacity:1}}
 @media(max-width:480px){.methods{gap:10px}.color-choices{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* One shared stage keeps the visual center and return action still during a test. */
+.test-stage {width:100%}
+.stage-body {min-height:260px;display:flex;align-items:center;justify-content:center}
+.stage-body>section {width:100%}
+.stage-body .loading {display:flex;align-items:center;justify-content:center;min-height:260px}
+.stage-body .loading>svg {display:block;width:24px;height:24px;margin:0 auto}
+.stage-body.is-result {align-items:flex-end;padding-bottom:12px}
+.stage-body .result h2 {margin:0}
+.stage-footer {display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:16px}
+.retry-slot,.cast-action-slot {height:44px;display:flex;justify-content:center}
+.stage-footer .back-action {margin:0;min-width:112px}
+.answer-slot {height:80px;display:flex;align-items:center;justify-content:center}
+.answer-slot h2 {margin:0}
+.ritual-answer,.tarot-answer {animation:answer-reveal 220ms ease-out both}
+.choices.has-selection button:not(.is-chosen) {opacity:.4}
+.choices.has-selection button.is-chosen {opacity:1;animation:choice-confirm 180ms ease-out both}
+.lucky-numbers button,.color-choices button {transition:opacity 160ms ease,box-shadow 160ms ease}
+.color-choices .is-chosen .color-swatch {animation:swatch-confirm 180ms ease-out both}
+.name-form.is-submitting .primary-action {opacity:1;animation:choice-confirm 160ms ease-out both}
+.yao-line.is-new span {animation:line-reveal 220ms ease-out both}
+@keyframes stage-fade {from{opacity:0}to{opacity:1}}
+@keyframes answer-reveal {from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+@keyframes choice-confirm {0%{transform:scale(1)}45%{transform:scale(.97)}100%{transform:scale(1)}}
+@keyframes swatch-confirm {50%{transform:scale(1.14)}}
+@keyframes line-reveal {from{opacity:.2;transform:scaleX(.86)}to{opacity:1;transform:scaleX(1)}}
+@media(max-width:480px){.stage-body,.stage-body .loading{min-height:244px}}

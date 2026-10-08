@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+const context = vm.createContext({setTimeout, Event, document:{createDocumentFragment:()=>new EventTarget(),createTextNode:text=>({text})}});
+vm.runInContext(`window = this; Element = function(){}; Object.hasOwn = undefined; Array.prototype.flatMap = undefined; globalThis = undefined; queueMicrotask = undefined; AbortController = undefined; WeakRef = undefined;`, context);
+vm.runInContext(fs.readFileSync(new URL('./compat.js', import.meta.url),'utf8'),context);
+assert.equal(vm.runInContext('globalThis === window',context),true);
+assert.equal(vm.runInContext('Object.hasOwn({a:1},"a") && !Object.hasOwn({},"toString")',context),true);
+assert.equal(vm.runInContext('JSON.stringify([1,2].flatMap(x=>[x,x+1]))',context),'[1,2,2,3]');
+assert.equal(vm.runInContext('var c=new AbortController(); var called=0; c.signal.addEventListener("abort",()=>called++); c.abort(); c.abort(); c.signal.aborted && called === 1',context),true);
+assert.equal(vm.runInContext('var n={isConnected:true}; var w=new WeakRef(n); var okay=w.deref()===n;n.isConnected=false;okay && w.deref()===undefined',context),true);
+assert.equal(vm.runInContext('var e=new Element();e.appendChild=function(x){this.value=x};e.replaceChildren("hi");e.value.text',context),'hi');
+vm.runInContext('var microtask=false;queueMicrotask(()=>microtask=true)',context);
+await new Promise(resolve=>setTimeout(resolve,0));
+assert.equal(vm.runInContext('microtask',context),true);
+console.log('PASS: feature-detected local fallbacks in isolated Node VM; not a DOM or Chrome61 integration test.');

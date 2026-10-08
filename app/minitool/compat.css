@@ -1,0 +1,118 @@
+/* Local baselines for features a syntax compiler cannot reliably polyfill.
+   Applied only to the mini-tool build. Original React/coss UI stays unchanged. */
+html { touch-action: manipulation; }
+body { -webkit-touch-callout: none; }
+html, body { min-height: 100%; }
+body { min-height: 100vh; min-height: var(--app-height, 100vh); }
+img { max-width: 100%; }
+button, [role="button"], [role="combobox"] { touch-action: manipulation; }
+button:active, [role="button"]:active { -webkit-tap-highlight-color: transparent; }
+
+/* Declarations following an unsupported min()/clamp() remain complete. */
+.masthead { padding: 28px 24px; padding-top: calc(28px + var(--safe-area-inset-top, 0px)); }
+main { width: calc(100% - 48px); max-width: 600px; padding: 48px 0; padding-top: 9vh; }
+@media (min-width: 601px) { .masthead { padding-right: 4vw; padding-left: 4vw; } }
+@media (min-width: 1600px) { .masthead { padding-right: 64px; padding-left: 64px; } }
+@media (max-height: 533px) { main { padding-top: 48px; } }
+@media (min-height: 978px) { main { padding-top: 88px; } }
+.result h2 { font-size: 8vw; }
+@media (max-width: 425px) { .result h2 { font-size: 34px; } }
+@media (min-width: 550px) { .result h2 { font-size: 44px; } }
+.tarot-answer h2 { font-size: 6vw; }
+@media (max-width: 466px) { .tarot-answer h2 { font-size: 28px; } }
+@media (min-width: 600px) { .tarot-answer h2 { font-size: 36px; } }
+
+/* Chrome 61 has Grid gap under its original prefixed property names. */
+.methods, .choices { grid-gap: 12px; }
+.result-actions { grid-gap: 4px; }
+.birth-form { grid-gap: 20px; }
+.choices.tarot { grid-gap: 3vw; gap: 3vw; }
+@media (max-width: 400px) { .choices.tarot { grid-gap: 12px; gap: 12px; } }
+@media (min-width: 934px) { .choices.tarot { grid-gap: 28px; gap: 28px; } }
+
+/* Use a single margin baseline for the actual coss Flex containers, on all
+   engines. Do not confuse CSS gap syntax support with Flex-gap support. */
+[data-slot="button"], [data-slot="popover-trigger"], [data-slot="select-trigger"],
+[data-slot="select-button"], [data-slot="field"], [data-slot="field-label"],
+[data-slot="select-label"], [data-slot="calendar"] .flex { gap: 0; }
+[data-slot="button"] > * + *, [data-slot="popover-trigger"] > * + *,
+[data-slot="select-trigger"] > * + *, [data-slot="select-button"] > * + *,
+[data-slot="field-label"] > * + *, [data-slot="select-label"] > * + * { margin-left: 8px; }
+[data-slot="button"] > [data-slot="button-loading-indicator"] { margin-left: 0; }
+[data-slot="field"] > * + * { margin-top: 8px; }
+[data-slot="calendar"] .gap-1\.5 > * + * { margin-left: 6px; }
+[data-slot="calendar"] .gap-2 > * + * { margin-left: 8px; }
+[data-slot="calendar"] .flex-col.gap-2 > * + * { margin-left: 0; margin-top: 8px; }
+@media (min-width: 640px) {
+  [data-slot="calendar"] .flex-col.gap-2 > * + * { margin-left: 8px; margin-top: 0; }
+}
+[data-slot="field"], [data-slot="select-trigger"], [data-slot="select-value"],
+[data-slot="select-button"], [data-slot="popover-viewport"], [data-slot="calendar"] .flex > * { min-width: 0; }
+[data-slot="popover-viewport"], [data-slot="select-list"] { min-height: 0; -webkit-overflow-scrolling: touch; }
+
+/* Only this popup hosts a calendar: replace its :has() styling exactly. */
+.date-popup { border-radius: calc(var(--radius) + 4px); }
+.date-popup::before { border-radius: calc(var(--radius) + 3px); }
+.date-popup [data-slot="popover-viewport"] { padding: 8px; --viewport-inline-padding: 8px; }
+[data-slot="calendar"] { --cell-size: 2.5rem; }
+@media (max-width: 399px) { [data-slot="calendar"] { --cell-size: 10vw; } }
+@media (max-width: 303px) { [data-slot="calendar"] { --cell-size: 1.9rem; } }
+@media (min-width: 640px) { [data-slot="calendar"] { --cell-size: 2.25rem; } }
+.calendar-select-popup { max-height: 300px; }
+[data-slot="select-list"] { max-height: 300px; max-height: var(--available-height, 300px); }
+.calendar-select-popup[data-slot="select-list"] { max-height: 300px; }
+[data-slot="select-item"] { grid-gap: 8px; }
+[data-slot="calendar"] [data-selected] button { background: #262626; color: #fafafa; }
+@media (hover: hover) {
+  [data-slot="calendar"] td:not([data-selected]) button:hover { background: rgba(0,0,0,.04); }
+}
+
+/* A width-relative padding box replaces aspect-ratio without changing cards. */
+.choices.tarot .tarot-card { aspect-ratio: auto; height: auto; }
+.choices.tarot .tarot-card::before { position: relative; display: block; width: 100%; height: 0; padding-top: 166.666667%; border-radius: 10px; content: ""; top: auto; right: auto; bottom: auto; left: auto; }
+.choices.tarot .tarot-card .card-inner { position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; margin: 0; }
+.card-front { top: 0; right: 0; bottom: 0; left: 0; }
+.choices.tarot .tarot-card:focus, .choices.tarot .tarot-card.is-selected { transform: translateY(-8px) rotate(0); }
+
+/* Tailwind focus selectors are lowered to :focus. This explicit last-resort
+   outline also remains visible if a host strips or alters shadow variables. */
+button:focus, [role="combobox"]:focus, [role="option"]:focus { outline: 2px solid #a1a1a1; outline-offset: 2px; }
+h2:focus { outline: none; }
+
+/* Safe areas first use ordinary values, then container variables and env.
+   Chrome 61 can use injected custom properties without needing env(). */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .masthead { padding-top: calc(28px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px))); }
+}
+@media (max-width: 600px) {
+  main { padding-bottom: 48px; padding-bottom: calc(48px + var(--safe-area-inset-bottom, 0px)); }
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    main { padding-bottom: calc(48px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))); }
+  }
+}
+@media (max-width: 480px) {
+  .masthead { padding: 22px 24px; padding-top: calc(22px + var(--safe-area-inset-top, 0px)); }
+  main { padding-top: 44px; }
+  @supports (padding-top: env(safe-area-inset-top)) {
+    .masthead { padding-top: calc(22px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px))); }
+  }
+}
+@media (max-width: 360px) {
+  main { width: calc(100% - 32px); }
+  .methods, .choices { grid-gap: 8px; gap: 8px; }
+}
+
+/* Twelve-method additions: Grid names and Flex margin baselines for Chrome61. */
+.name-form { grid-gap: 24px; }
+.six-yao-ritual, .coins, .yao-lines, .yao-line, .stage-footer { gap: 0; }
+.six-yao-ritual > * + * { margin-top: 16px; }
+.coins > * + * { margin-left: 12px; }
+.yao-lines > * + * { margin-bottom: 10px; }
+.yao-line > * + * { margin-left: 14px; }
+.yao-line.yang > * + * { margin-left: 0; }
+.stage-footer > * + * { margin-top: 4px; }
+.color-choices [data-slot="button"] > * + * { margin-left: 10px; }
+.ritual-answer h2 { font-size: 6vw; }
+@media (max-width: 466px) { .ritual-answer h2 { font-size: 28px; } }
+@media (min-width: 600px) { .ritual-answer h2 { font-size: 36px; } }
+@media (max-width: 480px) { .methods { grid-gap: 10px; gap: 10px; } }

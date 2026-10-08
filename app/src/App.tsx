@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
@@ -32,20 +32,24 @@ function BirthForm({onSubmit}:{onSubmit:()=>void}) {
 }
 export default function App(){
  const [method,setMethod]=useState<Method|null>(null); const [screen,setScreen]=useState<'home'|'selection'|'loading'|'result'>('home'); const [question,setQuestion]=useState(0); const [deck,setDeck]=useState<string[]>([]); const [flipped,setFlipped]=useState<number|null>(null); const [revealed,setRevealed]=useState(false); const [round,setRound]=useState(0);
+ const stageBody=useRef<HTMLDivElement>(null); const [stageHeight,setStageHeight]=useState(0);
  const timer=useRef<ReturnType<typeof setTimeout>|null>(null); const heading=useRef<HTMLHeadingElement>(null); const busy=useRef(false);
  const cancel=()=>{if(timer.current)clearTimeout(timer.current);timer.current=null;busy.current=false;};
  useEffect(()=>()=>{if(timer.current)clearTimeout(timer.current)},[]);
- useEffect(()=>{if(screen!=='home')heading.current?.focus()},[screen,method,question,revealed,round]);
- function later(ms:number,fn:()=>void){timer.current=setTimeout(fn,window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:ms)}
- function select(m:Method){cancel();setMethod(m);setQuestion(0);setFlipped(null);setRevealed(false);setRound(v=>v+1);const shuffled=[...cards];for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}setDeck(shuffled.slice(0,3));setScreen('selection')}
- function home(){cancel();setScreen('home');setTimeout(()=>document.querySelector<HTMLButtonElement>(`[data-method="${method}"]`)?.focus(),0)}
+ useEffect(()=>{if(screen!=='home')heading.current?.focus({preventScroll:true})},[screen,method,question,revealed,round]);
+ useLayoutEffect(()=>{if(screen==='selection'&&stageBody.current)setStageHeight(stageBody.current.getBoundingClientRect().height)},[screen,method,round]);
+ function later(ms:number,fn:()=>void){timer.current=setTimeout(()=>{timer.current=null;fn()},window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:ms)}
+ function select(m:Method){cancel();setStageHeight(0);setMethod(m);setQuestion(0);setFlipped(null);setRevealed(false);setRound(v=>v+1);const shuffled=[...cards];for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}setDeck(shuffled.slice(0,3));setScreen('selection')}
+ function home(){cancel();setScreen('home');timer.current=setTimeout(()=>{timer.current=null;document.querySelector<HTMLButtonElement>(`[data-method="${method}"]`)?.focus({preventScroll:true})},0)}
  function test(){if(busy.current)return;busy.current=true;setScreen('loading');later(360,()=>{setScreen('result');busy.current=false})}
  function answer(){if(busy.current)return;if(question===0){busy.current=true;later(180,()=>{setQuestion(1);busy.current=false})}else test()}
  function flip(i:number){if(busy.current)return;busy.current=true;setFlipped(i);later(660,()=>setRevealed(true))}
  const back=<Button variant="ghost" className="back-action" onClick={home}>换个方式</Button>;
- const actions=(tarot=false)=><div className="result-actions"><Button className="primary-action" onClick={()=>select(method!)}>{tarot?'再抽一次':'再测一次'}</Button>{back}</div>;
+ const complete=screen==='result'||revealed;
+ const actions=<div className="stage-footer"><div className="retry-slot">{complete&&<Button className="primary-action" onClick={()=>select(method!)}>{method==='tarot'?'再抽一次':'再测一次'}</Button>}</div>{back}</div>;
  return <><header className="masthead"><h1>今天适合上班吗？</h1></header><main>
  {screen==='home'&&<section className="methods" aria-label="选择方式">{methods.map(m=><Button variant="outline" key={m.id} data-method={m.id} onClick={()=>select(m.id)}>{m.label}</Button>)}</section>}
+ {screen!=='home'&&<div className={`test-stage stage-${method}`}><div ref={stageBody} className={`stage-body ${screen==='result'?'is-result':''}`} style={screen!=='selection'&&stageHeight?{minHeight:stageHeight}:undefined}>
  {screen==='selection'&&method&&<section className={`selection ${method}`} key={`${method}-${round}`}><h2 ref={heading} tabIndex={-1}>{method==='mbti'?questions[question].title:titles[method]}</h2>
  {method==='mbti'&&<div className="choices mbti" key={question}>{questions[question].answers.map(a=><Button key={a} variant="outline" onClick={answer}>{a}</Button>)}</div>}
  {(method==='zodiac'||method==='animal')&&<div className="choices">{options[method].map(o=><Button key={o} variant="outline" onClick={test}>{o}</Button>)}</div>}
@@ -57,10 +61,11 @@ export default function App(){
  {method==='pendulum'&&<Pendulum onReveal={()=>setRevealed(true)} revealed={revealed}/>}
  {method==='crystal'&&<CrystalBall onReveal={()=>setRevealed(true)} revealed={revealed}/>}
  {method==='sixyao'&&<SixYao onReveal={()=>setRevealed(true)} revealed={revealed}/>}
- {revealed&&['pendulum','crystal','sixyao'].includes(method)&&<div className="ritual-answer" aria-live="polite"><h2 ref={heading} tabIndex={-1}>不适合上班</h2>{actions()}</div>}
- {method==='tarot'&&<><div className="choices tarot">{deck.map((name,i)=><Button key={i} variant="ghost" className={`tarot-card ${flipped===i?'is-flipped is-selected':''}`} disabled={flipped!==null} onClick={()=>flip(i)} aria-label={flipped===i?name:`翻开第 ${i+1} 张牌`}><span className="card-inner"><span className="card-side card-back"><img src="./assets/card-back.svg" alt=""/></span><span className="card-side card-front" aria-hidden={flipped!==i}><img src="./assets/card-face.svg" alt=""/><span className="card-name">{name}</span></span></span></Button>)}</div>{revealed&&<div className="tarot-answer" aria-live="polite"><h2 ref={heading} tabIndex={-1}>不适合上班</h2>{actions(true)}</div>}</>}
- {!revealed&&back}</section>}
- {screen==='loading'&&<section className="loading" aria-label="测试中" aria-live="polite"><Spinner aria-label="测试中" className="size-6"/>{back}</section>}
- {screen==='result'&&<section className="result" aria-live="polite"><h2 ref={heading} tabIndex={-1}>不适合上班</h2>{actions()}</section>}
+ {['pendulum','crystal','sixyao'].includes(method)&&<div className="answer-slot" aria-live="polite">{revealed&&<div className="ritual-answer"><h2 ref={heading} tabIndex={-1}>不适合上班</h2></div>}</div>}
+ {method==='tarot'&&<><div className="choices tarot">{deck.map((name,i)=><Button key={i} variant="ghost" className={`tarot-card ${flipped===i?'is-flipped is-selected':''}`} disabled={flipped!==null} onClick={()=>flip(i)} aria-label={flipped===i?name:`翻开第 ${i+1} 张牌`}><span className="card-inner"><span className="card-side card-back"><img src="./assets/card-back.svg" alt=""/></span><span className="card-side card-front" aria-hidden={flipped!==i}><img src="./assets/card-face.svg" alt=""/><span className="card-name">{name}</span></span></span></Button>)}</div><div className="answer-slot" aria-live="polite">{revealed&&<div className="tarot-answer"><h2 ref={heading} tabIndex={-1}>不适合上班</h2></div>}</div></>}
+ </section>}
+ {screen==='loading'&&<section className="loading" aria-label="测试中" aria-live="polite"><Spinner aria-label="测试中" className="size-6"/></section>}
+ {screen==='result'&&<section className="result" aria-live="polite"><h2 ref={heading} tabIndex={-1}>不适合上班</h2></section>}
+ </div>{actions}</div>}
  </main></>;
 }

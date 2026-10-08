@@ -21,9 +21,11 @@ function useRitualTimer() {
 }
 
 export function LuckyNumber({ onSubmit }: { onSubmit: () => void }) {
-  return <div className="choices lucky-numbers" aria-label="选择幸运数字">
+  const [selected, setSelected] = useState<number | null>(null);
+  const run = useRitualTimer();
+  return <div className={`choices lucky-numbers ${selected !== null ? 'has-selection' : ''}`} aria-label="选择幸运数字">
     {Array.from({ length: 9 }, (_, i) => i + 1).map(number =>
-      <Button key={number} variant="outline" onClick={onSubmit}>{number}</Button>)}
+      <Button key={number} variant="outline" className={selected === number ? 'is-chosen' : undefined} disabled={selected !== null} onClick={() => run(180, () => setSelected(number), onSubmit)}>{number}</Button>)}
   </div>;
 }
 
@@ -33,8 +35,10 @@ const colors = [
   { name: '蓝色', value: '#799bc0' }, { name: '紫色', value: '#a28bb7' },
 ];
 export function ColorChoice({ onSubmit }: { onSubmit: () => void }) {
-  return <div className="choices color-choices" aria-label="选择颜色">
-    {colors.map(color => <Button key={color.name} variant="outline" onClick={onSubmit}>
+  const [selected, setSelected] = useState<string | null>(null);
+  const run = useRitualTimer();
+  return <div className={`choices color-choices ${selected !== null ? 'has-selection' : ''}`} aria-label="选择颜色">
+    {colors.map(color => <Button key={color.name} variant="outline" className={selected === color.name ? 'is-chosen' : undefined} disabled={selected !== null} onClick={() => run(180, () => setSelected(color.name), onSubmit)}>
       <span className="color-swatch" style={{ backgroundColor: color.value }} aria-hidden="true" />
       {color.name}
     </Button>)}
@@ -42,12 +46,14 @@ export function ColorChoice({ onSubmit }: { onSubmit: () => void }) {
 }
 
 export function NameForm({ onSubmit }: { onSubmit: () => void }) {
+  const [submitting, setSubmitting] = useState(false);
+  const run = useRitualTimer();
   // No name attribute, storage, or network submission. The optional nickname dies with this form.
-  return <form className="name-form" autoComplete="off" onSubmit={event => { event.preventDefault(); onSubmit(); }}>
+  return <form className={`name-form ${submitting ? 'is-submitting' : ''}`} autoComplete="off" onSubmit={event => { event.preventDefault(); run(160, () => setSubmitting(true), onSubmit); }}>
     <Field><FieldLabel htmlFor="nickname">昵称（选填）</FieldLabel>
-      <FieldControl id="nickname" className="nickname-input" type="text" maxLength={32} autoComplete="off" spellCheck={false} />
+      <FieldControl id="nickname" readOnly={submitting} className="nickname-input" type="text" maxLength={32} autoComplete="off" spellCheck={false} />
     </Field>
-    <Button className="primary-action" type="submit">测一测</Button>
+    <Button className="primary-action" disabled={submitting} type="submit">测一测</Button>
   </form>;
 }
 
@@ -57,7 +63,7 @@ export function Pendulum({ onReveal, revealed }: { onReveal: () => void; reveale
   return <div className="ritual">
     <Button variant="ghost" className={`ritual-target pendulum-target ${swinging ? 'is-moving' : ''}`}
       disabled={swinging || revealed} aria-label={swinging ? '灵摆摆动中' : '轻触灵摆'}
-      onClick={() => run(1100, () => setSwinging(true), () => { setSwinging(false); onReveal(); })}>
+      onClick={() => run(1200, () => setSwinging(true), () => { setSwinging(false); onReveal(); })}>
       <svg className="size-40 ritual-svg" viewBox="0 0 160 180" fill="none" aria-hidden="true">
         <circle cx="80" cy="20" r="4" fill="currentColor" />
         <g className="pendulum-arm"><path d="M80 24v89" stroke="currentColor" strokeWidth="1.5" />
@@ -75,7 +81,7 @@ export function CrystalBall({ onReveal, revealed }: { onReveal: () => void; reve
   return <div className="ritual">
     <Button variant="ghost" className={`ritual-target crystal-target ${glowing ? 'is-moving' : ''}`}
       disabled={glowing || revealed} aria-label={glowing ? '水晶球显现中' : '轻触水晶球'}
-      onClick={() => run(1000, () => setGlowing(true), () => { setGlowing(false); onReveal(); })}>
+      onClick={() => run(960, () => setGlowing(true), () => { setGlowing(false); onReveal(); })}>
       <svg className="size-40 ritual-svg" viewBox="0 0 180 180" fill="none" aria-hidden="true">
         <defs><radialGradient id="crystal-fill" cx=".35" cy=".3" r=".8"><stop stopColor="#fff"/><stop offset="1" stopColor="#e5e2ef"/></radialGradient>
           <clipPath id="crystal-clip"><circle cx="90" cy="77" r="55" /></clipPath></defs>
@@ -94,11 +100,11 @@ export function SixYao({ onReveal, revealed }: { onReveal: () => void; revealed:
   const [casts, setCasts] = useState<Cast[]>([]);
   const [casting, setCasting] = useState(false);
   const run = useRitualTimer();
-  const coins = casts[casts.length - 1]?.coins ?? [true, false, true];
+  const [coins, setCoins] = useState([true, false, true]);
   function cast() {
     if (casts.length >= 6) return;
-    run(420, () => setCasting(true), () => {
-      const nextCoins = Array.from({ length: 3 }, () => Math.random() < .5);
+    const nextCoins = Array.from({ length: 3 }, () => Math.random() < .5);
+    run(540, () => { setCasting(true); setCoins(nextCoins); }, () => {
       const next = [...casts, { coins: nextCoins, yang: nextCoins.filter(Boolean).length % 2 === 1 }];
       setCasts(next);
       setCasting(false);
@@ -110,9 +116,9 @@ export function SixYao({ onReveal, revealed }: { onReveal: () => void; revealed:
       {coins.map((head, i) => <span className="coin" key={i}>{head ? '正' : '反'}</span>)}
     </div>
     <div className="yao-lines" role="img" aria-label={casts.length ? `已成 ${casts.length} 爻，自下而上：${casts.map(c => c.yang ? '阳' : '阴').join('、')}` : '等待第一爻'}>
-      {Array.from({ length: 6 }, (_, i) => <div key={i} className={`yao-line ${casts[i] ? (casts[i].yang ? 'yang' : 'yin') : 'empty'}`} data-line={casts[i] ? (casts[i].yang ? 'yang' : 'yin') : 'empty'}><span /><span /></div>)}
+      {Array.from({ length: 6 }, (_, i) => <div key={i} className={`yao-line ${casts[i] ? (casts[i].yang ? 'yang' : 'yin') : 'empty'} ${casts[i] && i === casts.length - 1 ? 'is-new' : ''}`} data-line={casts[i] ? (casts[i].yang ? 'yang' : 'yin') : 'empty'}><span /><span /></div>)}
     </div>
     <span className="cast-count" role="status">{casts.length} / 6</span>
-    {!revealed && <Button className="primary-action" disabled={casting || casts.length >= 6} onClick={cast}>{casting ? '落币中' : `掷第 ${casts.length + 1} 次`}</Button>}
+    <div className="cast-action-slot">{!revealed && <Button className="primary-action" disabled={casting || casts.length >= 6} onClick={cast}>{casting ? '落币中' : `掷第 ${casts.length + 1} 次`}</Button>}</div>
   </div>;
 }

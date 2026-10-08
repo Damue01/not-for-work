@@ -1,0 +1,80 @@
+:root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; color: #262626; background: #fff; font-synthesis: none; -webkit-text-size-adjust: 100%; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 280px; }
+main { width: min(100% - 48px, 600px); margin: 0 auto; padding: clamp(48px, 9vh, 88px) 0 48px; }
+.masthead { padding: 28px clamp(24px, 4vw, 64px); }
+h1 { margin: 0; font-size: 16px; line-height: 1.5; font-weight: 500; color: #737373; letter-spacing: -.025em; }
+h2 { margin: 0 0 20px; font-size: 16px; font-weight: 500; line-height: 1.5; }
+button, input, select { appearance: none; -webkit-appearance: none; font: inherit; font-size: 16px; line-height: 1.5; color: inherit; background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; min-height: 48px; padding: 11px 16px; box-shadow: 0 1px 2px #00000008; }
+button { font-weight: 500; cursor: pointer; touch-action: manipulation; transition: background-color 160ms, border-color 160ms, box-shadow 160ms, transform 160ms, opacity 160ms; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid #737373; outline-offset: 3px; }
+h2:focus { outline: none; }
+button:active { background: #e5e5e5; transform: scale(.97); }
+button.is-selected { background: #ededed; border-color: #a3a3a3; transform: scale(.97); }
+button:disabled { cursor: default; }
+@media (hover: hover) { button:not(:disabled):hover { background: #f5f5f5; border-color: #d4d4d4; transform: translateY(-2px); } .primary:not(:disabled):hover { background: #404040; border-color: #404040; } .text-button:not(:disabled):hover { background: #f5f5f5; border-color: transparent; } }
+.methods { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.methods button { min-height: 92px; font-size: 18px; }
+.choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.choices button { padding-inline: 6px; font-size: 16px; }
+.choices.mbti { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.choices.mbti button { min-height: 72px; }
+.choices.fortune { display: flex; justify-content: center; padding-top: 12px; }
+#selection:has(.choices.fortune) > h2 { text-align: center; }
+.choices.fortune button { min-width: 128px; }
+.primary { background: #262626; border-color: #262626; color: #fff; }
+.primary:active { background: #525252; }
+.text-button { border-color: transparent; box-shadow: none; color: #737373; font-weight: 400; padding-inline: 12px; }
+#selection > .text-button, #loading > .text-button { margin: 20px 0 0 -12px; }
+#birth-form { display: grid; gap: 10px; }
+#birth-form label { font-size: 16px; font-weight: 500; line-height: 1.5; }
+#birth-form input, #birth-form select { width: 100%; min-width: 0; }
+#birth-form select { appearance: auto; }
+#birth-form label:not(:first-child) { margin-top: 8px; }
+#birth-form .primary { justify-self: start; margin-top: 14px; min-width: 112px; }
+.loading-indicator { display: block; width: 24px; height: 24px; border: 2px solid #e5e5e5; border-top-color: #525252; border-radius: 50%; animation: spin 650ms linear infinite; }
+#result { text-align: center; }
+#result-title { font-size: clamp(34px, 8vw, 44px); font-weight: 600; letter-spacing: -.025em; margin-bottom: 32px; }
+.result-actions { display: grid; justify-items: center; gap: 4px; width: fit-content; margin-inline: auto; }
+.result-actions > .primary { min-width: 128px; }
+.result-actions > .text-button { min-height: 44px; padding: 9px 12px; font-size: 14px; }
+main > section:not([hidden]), #tarot-answer:not([hidden]) { animation: arrive 260ms ease-out both; }
+.choices.mbti button { animation: arrive 220ms ease-out both; }
+[hidden] { display: none !important; }
+/* Existing illustrated cards keep their visual strokes; the page has no dividers. */
+.choices.tarot { gap: clamp(12px, 3vw, 28px); padding: 24px 4px 20px; perspective: 1000px; }
+.choices.tarot .tarot-card { position: relative; display: block; padding: 0; width: 100%; min-height: 0; aspect-ratio: 3 / 5; border: 0; border-radius: 10px; background: transparent; box-shadow: none; perspective: 1000px; transition: transform 240ms ease, opacity 240ms ease; }
+.tarot-card img { display: block; width: 100%; height: 100%; border-radius: 10px; }
+.choices.tarot .tarot-card:nth-child(1) { transform: translateY(8px) rotate(-5deg); }
+.choices.tarot .tarot-card:nth-child(3) { transform: translateY(8px) rotate(5deg); }
+@media (hover: hover) { .choices.tarot .tarot-card:not(:disabled):hover { transform: translateY(-8px) rotate(0); } }
+.choices.tarot .tarot-card:focus-visible, .choices.tarot .tarot-card.is-selected { transform: translateY(-8px) rotate(0); }
+.choices.tarot .tarot-card:disabled:not(.is-selected) { opacity: .38; }
+.card-inner { display: block; width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 650ms cubic-bezier(.2,.65,.2,1); }
+.card-side { display: block; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 10px; box-shadow: 0 8px 24px #00000012; }
+.card-front { position: absolute; inset: 0; transform: rotateY(180deg); background: #fafafa; border: 1px solid #d4d4d4; padding: 8%; }
+.card-front .card-name { position: absolute; left: 0; right: 0; bottom: 8%; font-size: 16px; line-height: 1.5; text-align: center; }
+.card-front img { object-fit: contain; }
+.tarot-card.is-flipped .card-inner { transform: rotateY(180deg); }
+#tarot-result { font-size: clamp(28px, 6vw, 36px); margin: 24px 0; font-weight: 600; }
+#tarot-answer { text-align: center; }
+
+@keyframes arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 480px) { .masthead { padding: 22px 24px; } main { padding-top: 44px; } .methods { grid-template-columns: repeat(2,minmax(0,1fr)); } .methods button { min-height: 82px; } .choices.tarot { padding-top: 20px; } }
+/* Keep navigation on choice screens comfortable without enlarging result actions. */
+@media (max-width: 600px) {
+  main { padding-bottom: max(48px, env(safe-area-inset-bottom)); }
+  #selection > .text-button,
+  #loading > .text-button {
+    display: block;
+    width: fit-content;
+    min-width: 112px;
+    min-height: 48px;
+    margin: 24px 0 0 auto;
+  }
+}
+#selection:has(.choices.fortune) > .text-button { display: block; width: fit-content; min-width: 0; min-height: 44px; margin: 4px auto 0; padding: 9px 12px; font-size: 14px; }
+#selection:has(#tarot-answer:not([hidden])) > .text-button { display: none; }
+@media (max-width: 360px) { main { width: calc(100% - 32px); } .methods, .choices { gap: 8px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

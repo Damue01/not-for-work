@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>今天适合上班吗</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="masthead"><h1>今天适合上班吗？</h1></header>
+  <main>
+    <section id="methods" aria-label="选择方式">
+      <div class="methods">
+        <button type="button" data-method="mbti">MBTI</button>
+        <button type="button" data-method="zodiac">星座</button>
+        <button type="button" data-method="animal">生肖</button>
+        <button type="button" data-method="bazi">八字</button>
+        <button type="button" data-method="tarot">塔罗牌</button>
+        <button type="button" data-method="fortune">抽签</button>
+      </div>
+    </section>
+    <section id="selection" hidden aria-labelledby="selection-title">
+      <h2 id="selection-title" tabindex="-1"></h2>
+      <div id="choices" class="choices"></div>
+      <div id="tarot-answer" hidden>
+        <h2 id="tarot-result" tabindex="-1">不适合上班</h2>
+        <div class="result-actions">
+          <button type="button" id="tarot-retry" class="primary">再抽一次</button>
+          <button type="button" class="text-button" data-action="home">换个方式</button>
+        </div>
+      </div>
+      <form id="birth-form" hidden autocomplete="off">
+        <label for="birth-date">出生日期</label>
+        <input id="birth-date" type="date" aria-label="出生日期（选填）">
+        <label for="birth-hour">出生时辰</label>
+        <select id="birth-hour">
+          <option value="">不清楚</option>
+          <option>子时　23:00–00:59</option><option>丑时　01:00–02:59</option>
+          <option>寅时　03:00–04:59</option><option>卯时　05:00–06:59</option>
+          <option>辰时　07:00–08:59</option><option>巳时　09:00–10:59</option>
+          <option>午时　11:00–12:59</option><option>未时　13:00–14:59</option>
+          <option>申时　15:00–16:59</option><option>酉时　17:00–18:59</option>
+          <option>戌时　19:00–20:59</option><option>亥时　21:00–22:59</option>
+        </select>
+        <button type="submit" class="primary">测一测</button>
+      </form>
+      <button type="button" class="text-button" data-action="home">换个方式</button>
+    </section>
+    <section id="loading" hidden aria-label="测试中" aria-live="polite">
+      <span class="loading-indicator" aria-hidden="true"></span>
+      <button type="button" class="text-button" data-action="home">换个方式</button>
+    </section>
+    <section id="result" hidden aria-labelledby="result-title">
+      <h2 id="result-title" tabindex="-1">不适合上班</h2>
+      <div class="result-actions">
+        <button type="button" id="retry" class="primary">再测一次</button>
+        <button type="button" class="text-button" data-action="home">换个方式</button>
+      </div>
+    </section>
+    <noscript><p>请启用 JavaScript。</p></noscript>
+  </main>
+</body>
+</html>

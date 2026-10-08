@@ -1,6 +1,6 @@
 # 今天适合上班吗？
 
-六种方式，一个答案。React + TypeScript + Vite + Tailwind CSS v4。
+十二种方式，一个答案。React + TypeScript + Vite + Tailwind CSS v4。
 
 ## 本地运行
 
@@ -22,7 +22,7 @@ npm run preview
 
 ## 真实 coss UI 组件
 
-`src/components/ui/` 的 Button、Select、Calendar、Popover、Field、Spinner 直接来自 https://coss.com/ui 的官方 registry，并在整个应用中复用。日期选择器使用官方 Calendar + Popover 组合，年月导航与出生时辰共用 Select。原始 registry 响应保存在 `vendor/coss/`，只调整了 import alias；页面布局和塔罗 SVG 为项目自有实现。
+`src/components/ui/` 的 Button、Select、Calendar、Popover、Field、Spinner 直接来自 https://coss.com/ui 的官方 registry，并在整个应用中复用。昵称表单复用官方 FieldControl + Field/FieldLabel；日期选择器使用官方 Calendar + Popover 组合，年月导航与出生时辰共用 Select。原始 registry 响应保存在 `vendor/coss/`，只调整了 import alias；页面布局和塔罗 SVG 为项目自有实现。
 
 官方安装命令：
 
@@ -34,7 +34,7 @@ npx shadcn@latest add @coss/button @coss/select @coss/calendar @coss/popover @co
 
 ## 隐私与可迁移性
 
-无统计、Cookie、存储、外部接口。出生日期与时辰仅保存在组件内存，离开表单就销毁，不参与答案计算，也不会发送。所有方式恒定显示“不适合上班”。保留两题 MBTI、直接点击塔罗翻牌、取消/重试与减少动态效果支持。未来可复用交互与资源，无小红书平台接入代码。
+无统计、Cookie、存储、外部接口。出生日期、时辰和选填昵称只存在当前页面内存中，离开表单就销毁，不参与答案计算，也不会发送。昵称不要求实名。所有方式恒定显示“不适合上班”。保留两题 MBTI、星座、生肖、八字、直接点击塔罗翻牌、抽签；新增幸运数字、色彩心理、姓名测试、灵摆、水晶球、六爻。六爻逐次掷币，从下往上显示六条阴阳线；灵摆与水晶球轻触后播放短动画。所有方法均支持取消/重试与减少动态效果，快速重复点击不会重复触发。所有内容仅作娱乐，不提供真实预测或心理、医疗判断。未来可复用交互与资源，无小红书平台接入代码。
 
 ## 第三方授权
 

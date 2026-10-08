@@ -69,7 +69,7 @@ h1 {margin:0;font-size:16px;line-height:1.5;font-weight:500;color:var(--muted-fo
 main {width:min(100% - 48px,600px);margin:0 auto;padding:clamp(48px,9vh,88px) 0 48px}
 h2 {margin:0 0 20px;font-size:16px;line-height:1.5;font-weight:500}h2:focus {outline:none}
 .methods,.choices {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.methods button {height:92px;font-size:18px}.choices button {height:48px;font-size:16px}
+.methods button {height:80px;font-size:18px}.choices button {height:48px;font-size:16px}
 .choices.mbti {grid-template-columns:repeat(2,minmax(0,1fr))}.choices.mbti button {height:72px}
 .back-action {height:44px;color:var(--muted-foreground);font-weight:400;padding-inline:12px}
 .selection > .back-action,.loading > .back-action {margin:20px 0 0 -12px}
@@ -93,6 +93,44 @@ main>section,.tarot-answer {animation:arrive 220ms ease-out both}
 .tarot-card.is-flipped .card-inner{transform:rotateY(180deg)}.tarot-answer h2{font-size:clamp(28px,6vw,36px);margin:24px 0;font-weight:600}
 @keyframes arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:600px){main{padding-bottom:max(48px,env(safe-area-inset-bottom))}.selection>.back-action,.loading>.back-action{display:block;width:fit-content;min-width:112px;min-height:48px;margin:24px 0 0 auto}}
-@media(max-width:480px){.masthead{padding:22px 24px}main{padding-top:44px}.methods{grid-template-columns:repeat(2,minmax(0,1fr))}.methods button{height:82px}.choices.tarot{padding-top:20px}}
+@media(max-width:480px){.masthead{padding:22px 24px}main{padding-top:44px}.methods{grid-template-columns:repeat(2,minmax(0,1fr))}.methods button{height:64px;font-size:16px}.choices.tarot{padding-top:20px}}
 @media(max-width:360px){main{width:calc(100% - 32px)}.methods,.choices{gap:8px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Additional methods reuse the coss controls; only ritual artwork is app-specific. */
+.selection > h2 {text-align:center}
+.selection > .back-action,.loading > .back-action {display:block;width:fit-content;margin:16px auto 0}
+.name-form,.birth-form {max-width:360px;margin-inline:auto}
+.name-form {display:grid;gap:24px}
+.name-form .primary-action,.birth-form .primary-action {justify-self:center}
+.nickname-input {height:48px;width:100%;border:1px solid var(--input);border-radius:var(--radius);padding:0 12px;background:var(--background);color:var(--foreground);font:inherit;outline:none;box-shadow:0 1px 2px #00000008}
+.nickname-input:focus-visible {outline:2px solid var(--ring);outline-offset:2px}
+.lucky-numbers,.color-choices {max-width:420px;margin-inline:auto}
+.color-choices button {height:64px;gap:10px}
+.color-swatch {display:block;width:18px;height:18px;flex-shrink:0;border-radius:50%;border:1px solid #0000000d}
+.ritual {display:flex;justify-content:center}
+.ritual-target {width:180px;height:190px;padding:0;cursor:pointer;background:transparent}
+.ritual-target:disabled {opacity:1}
+.ritual-target .ritual-svg {width:160px;height:180px;opacity:1}
+.pendulum-arm {transform-origin:80px 20px}
+.is-moving .pendulum-arm {animation:pendulum-swing 550ms ease-in-out 2}
+.crystal-halo {opacity:0}
+.is-moving .crystal-halo {animation:crystal-glow 1s ease-in-out}
+.is-moving .crystal-mist {animation:crystal-drift 1s ease-in-out}
+.ritual-answer {text-align:center;animation:arrive 220ms ease-out both}
+.ritual-answer h2 {font-size:clamp(28px,6vw,36px);font-weight:600;margin:20px 0 24px}
+.six-yao-ritual {display:flex;flex-direction:column;align-items:center;gap:16px}
+.coins {display:flex;gap:12px;height:36px}
+.coin {display:flex;width:36px;height:36px;align-items:center;justify-content:center;border:1px solid #c5b58d;border-radius:50%;background:#f5f0e4;color:#887650;font-size:13px}
+.coins.is-moving .coin {animation:coin-toss 420ms ease-in-out}
+.yao-lines {display:flex;flex-direction:column-reverse;gap:10px;width:112px;height:86px}
+.yao-line {display:flex;gap:14px;height:6px}
+.yao-line span {height:6px;flex:1;background:#77716a;border-radius:1px}
+.yao-line.yang {gap:0}.yao-line.yang span {border-radius:0}
+.yao-line.empty span {background:#efeeec}
+.cast-count {font-size:13px;line-height:20px;color:var(--muted-foreground)}
+@keyframes pendulum-swing {0%,100%{transform:rotate(0)}25%{transform:rotate(15deg)}75%{transform:rotate(-15deg)}}
+@keyframes crystal-glow {0%,100%{opacity:0}50%{opacity:.65}}
+@keyframes crystal-drift {0%,100%{transform:translateX(0)}50%{transform:translateX(10px)}}
+@keyframes coin-toss {50%{transform:translateY(-8px) rotateY(180deg)}}
+@media(max-width:480px){.methods{gap:10px}.color-choices{grid-template-columns:repeat(2,minmax(0,1fr))}}

@@ -10,10 +10,11 @@ import { Field, FieldLabel } from '@/components/ui/field';
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectTrigger, SelectValue, SelectPopup, SelectItem, SelectGroup } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
+import { LuckyNumber, ColorChoice, NameForm, Pendulum, CrystalBall, SixYao } from '@/components/ritual-methods';
 
-type Method = 'mbti'|'zodiac'|'animal'|'bazi'|'tarot'|'fortune';
-const methods: {id:Method;label:string}[] = [{id:'mbti',label:'MBTI'},{id:'zodiac',label:'星座'},{id:'animal',label:'生肖'},{id:'bazi',label:'八字'},{id:'tarot',label:'塔罗牌'},{id:'fortune',label:'抽签'}];
-const titles = {mbti:'MBTI',zodiac:'选择星座',animal:'选择生肖',bazi:'八字',tarot:'选一张牌',fortune:'抽签'};
+type Method = 'mbti'|'zodiac'|'animal'|'bazi'|'tarot'|'fortune'|'number'|'color'|'name'|'pendulum'|'crystal'|'sixyao';
+const methods: {id:Method;label:string}[] = [{id:'mbti',label:'MBTI'},{id:'zodiac',label:'星座'},{id:'animal',label:'生肖'},{id:'bazi',label:'八字'},{id:'tarot',label:'塔罗牌'},{id:'fortune',label:'抽签'},{id:'number',label:'幸运数字'},{id:'color',label:'色彩心理'},{id:'name',label:'姓名测试'},{id:'pendulum',label:'灵摆'},{id:'crystal',label:'水晶球'},{id:'sixyao',label:'六爻'}];
+const titles = {mbti:'MBTI',zodiac:'选择星座',animal:'选择生肖',bazi:'八字',tarot:'选一张牌',fortune:'抽签',number:'选择幸运数字',color:'选择一个颜色',name:'姓名测试',pendulum:'轻触灵摆',crystal:'轻触水晶球',sixyao:'六爻'};
 const options = {zodiac:['白羊座','金牛座','双子座','巨蟹座','狮子座','处女座','天秤座','天蝎座','射手座','摩羯座','水瓶座','双鱼座'],animal:['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪']};
 const questions = [{title:'周末更想？',answers:['一个人待着','和朋友见面']},{title:'做事习惯？',answers:['先计划','凭感觉']}];
 const cards = ['愚者','魔术师','女祭司','皇后','皇帝','教皇','恋人','战车','力量','隐者','命运之轮','正义','倒吊人','死神','节制','恶魔','高塔','星星','月亮','太阳','审判','世界'];
@@ -50,6 +51,13 @@ export default function App(){
  {(method==='zodiac'||method==='animal')&&<div className="choices">{options[method].map(o=><Button key={o} variant="outline" onClick={test}>{o}</Button>)}</div>}
  {method==='fortune'&&<div className="draw-action"><Button className="primary-action" onClick={test}>抽一签</Button></div>}
  {method==='bazi'&&<BirthForm onSubmit={test}/>}
+ {method==='number'&&<LuckyNumber onSubmit={test}/>}
+ {method==='color'&&<ColorChoice onSubmit={test}/>}
+ {method==='name'&&<NameForm onSubmit={test}/>}
+ {method==='pendulum'&&<Pendulum onReveal={()=>setRevealed(true)} revealed={revealed}/>}
+ {method==='crystal'&&<CrystalBall onReveal={()=>setRevealed(true)} revealed={revealed}/>}
+ {method==='sixyao'&&<SixYao onReveal={()=>setRevealed(true)} revealed={revealed}/>}
+ {revealed&&['pendulum','crystal','sixyao'].includes(method)&&<div className="ritual-answer" aria-live="polite"><h2 ref={heading} tabIndex={-1}>不适合上班</h2>{actions()}</div>}
  {method==='tarot'&&<><div className="choices tarot">{deck.map((name,i)=><Button key={i} variant="ghost" className={`tarot-card ${flipped===i?'is-flipped is-selected':''}`} disabled={flipped!==null} onClick={()=>flip(i)} aria-label={flipped===i?name:`翻开第 ${i+1} 张牌`}><span className="card-inner"><span className="card-side card-back"><img src="./assets/card-back.svg" alt=""/></span><span className="card-side card-front" aria-hidden={flipped!==i}><img src="./assets/card-face.svg" alt=""/><span className="card-name">{name}</span></span></span></Button>)}</div>{revealed&&<div className="tarot-answer" aria-live="polite"><h2 ref={heading} tabIndex={-1}>不适合上班</h2>{actions(true)}</div>}</>}
  {!revealed&&back}</section>}
  {screen==='loading'&&<section className="loading" aria-label="测试中" aria-live="polite"><Spinner aria-label="测试中" className="size-6"/>{back}</section>}
